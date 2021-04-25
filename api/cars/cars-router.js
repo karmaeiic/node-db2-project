@@ -1,1 +1,36 @@
-// DO YOUR MAGIC
+const express = require("express")
+const db = require("../data/seeds/01-cars.js")
+
+const router = express.Router()
+
+router.get("/cars", async (req, res, next) => {
+	try {
+		res.json(await db("cars"))
+	} catch(err) {
+		next(err)
+	}
+})
+
+router.get("/cars/:id", async (req, res, next) => {
+	try {
+		const { id } = req.params
+		const car = await db("cars").where({ id }).first()
+		
+		res.json(car)
+	} catch(err) {
+		next(err)
+	}
+})
+
+router.post("/cars", async (req, res, next) => {
+	try {
+		const [id] = await db("cars").insert(req.body)
+		const newCars = await db("cars").where({ id }).first()
+
+		res.status(201).json(newCars)
+	} catch(err) {
+		next(err)
+	}
+})
+
+module.exports = router
